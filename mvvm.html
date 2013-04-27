@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>mvvm</title>
+<script src="fitemp.js"></script>
+<script src="vm.js"></script>
+</head>
+
+<body>
+
+<div id="template">
+
+<script type="template" id="tmp1">
+<div>
+    <label for="firstname">firstname</label>
+    <input id="firstname" data-bind="firstname" type="text" value="<%=firstname%>"></input>
+</div>
+<div>
+    <label for="lastname">lastname</label>
+    <input id="lastname" data-bind="lastname" type="text" value="<%=lastname%>"/>
+</div>
+<div>
+    <label>my name is : </label><span><%=(firstname+' '+lastname)%></span>
+</div>
+<select>
+<option>11</option>
+<option>22</option>
+</select>
+</script>
+
+</div>
+
+<div id="show">
+
+<div id="view-tmp1" data-name="view-tmp1">
+</div>
+
+</div>
+
+
+</body>
+<script>
+function $(id) {
+    return document.getElementById(id);
+}
+window.onload = function() {
+
+$('view-tmp1').innerHTML = temp.render('tmp1', {firstname: 'first', lastname: 'last'});
+
+//strongObserve();
+weakObserve();
+/*
+document.addEventListener('click', function(e) {
+    console.log(e.target.tagName);
+})
+*/
+}
+</script>
+</html>
