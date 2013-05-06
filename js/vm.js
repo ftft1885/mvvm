@@ -24,17 +24,48 @@ function strongObserve(parent) {
     }
 }
 
-function weakObserve(o) {
-	var e = new vmListener(o);
-	
-	e.updateView(o);
-    var bind = "bind";
+function bindListener() {
     var inputs = document.getElementsByTagName('input');
     var selects = document.getElementsByTagName('select');
+	var buttons = document.getElementsByTagName('button');
+	var as = document.getElementsByTagName('a');
+
     var els = [];
+	var clicks = [];
+
+	var click_types = ['a', 'button'];
+
+	for (var i = 0; i < buttons.length; i++) {
+		console.log(buttons[i]);
+		if (typeof buttons[i].name === "string" && buttons[i].getAttribute('method')) {
+			clicks.push(buttons[i]);
+		}
+	}
+	for (var i = 0; i < as.length; i++) {
+		if (typeof as[i].name === "string" && typeof as[i].method === "string") {
+			clicks.push(as[i]);
+		}
+	}
+	for (var i = 0; i < clicks.length; i++) {
+		clicks[i].addEventListener('click', _clickListener);
+	}
+	console.log(clicks);
+	function _clickListener(_e) {
+		e.method = _e.target.getAttribute("method");
+		e.key = _e.target.name;
+		var onclick = "onclick";
+		if (onclick in o && typeof o[onclick] === 'function') {
+			o[onclick](e);
+		}
+		//e.updateModel();
+	}
+
+
     var types = ['text', 'checkbox', 'radio'];
     for (var i = 0; i < inputs.length; i++) {
-        if (types.indexOf(inputs[i].type) != -1) {
+        if (types.indexOf(inputs[i].type) != -1 && inputs[i].name !== '') {
+
+			// name is a property in dom, if not defined, it is ''
             els.push(inputs[i]);
         }
     }
@@ -54,7 +85,76 @@ function weakObserve(o) {
 				
 				o[changeListener](e);
 			}
-//            updateModel(e.target.name, e.target.value);
+        }
+    }
+
+}
+
+function weakObserve(o) {
+	var e = new vmListener(o);
+	
+	e.updateView(o);
+    //var bind = "bind";
+    var inputs = document.getElementsByTagName('input');
+    var selects = document.getElementsByTagName('select');
+	var buttons = document.getElementsByTagName('button');
+	var as = document.getElementsByTagName('a');
+
+    var els = [];
+	var clicks = [];
+
+	var click_types = ['a', 'button'];
+
+	for (var i = 0; i < buttons.length; i++) {
+		console.log(buttons[i]);
+		if (typeof buttons[i].name === "string" && buttons[i].getAttribute('method')) {
+			clicks.push(buttons[i]);
+		}
+	}
+	for (var i = 0; i < as.length; i++) {
+		if (typeof as[i].name === "string" && typeof as[i].method === "string") {
+			clicks.push(as[i]);
+		}
+	}
+	for (var i = 0; i < clicks.length; i++) {
+		clicks[i].addEventListener('click', _clickListener);
+	}
+	console.log(clicks);
+	function _clickListener(_e) {
+		e.method = _e.target.getAttribute("method");
+		e.key = _e.target.name;
+		var onclick = "onclick";
+		if (onclick in o && typeof o[onclick] === 'function') {
+			o[onclick](e);
+		}
+		//e.updateModel();
+	}
+
+
+    var types = ['text', 'checkbox', 'radio'];
+    for (var i = 0; i < inputs.length; i++) {
+        if (types.indexOf(inputs[i].type) != -1 && inputs[i].name !== '') {
+
+			// name is a property in dom, if not defined, it is ''
+            els.push(inputs[i]);
+        }
+    }
+    for (var i = 0; i < selects.length; i++) {
+        els.push(selects[i]);
+    }
+    for(var i = 0; i < els.length; i++) {
+        els[i].addEventListener('change', _listener);
+    }
+    function _listener(_e) {
+        if (typeof _e.target.name === "string") {
+			e.key = _e.target.name;
+			e.val = _e.target.value;
+			var changeListener = 'onchange';
+			e.updateModel();
+			if (changeListener in o && typeof o[changeListener] === 'function') {
+				
+				o[changeListener](e);
+			}
         }
     }
 }
@@ -65,9 +165,20 @@ function vmListener(o) {
 	this.view = o.view;
 }
 
+vmListener.prototype.push = function(val) {
+	var _arr = this.key.split('.');
+	arr2json({
+		arr: _arr,
+		val: val,
+		json: this.model,
+		method: this.method
+	});
+}
+
 vmListener.prototype.updateView = function() {
 	var htmlStr = temp.render(this.vm, this.model);
 	document.getElementById(this.view).innerHTML = htmlStr;
+	// may need to observe new dom
 }
 
 vmListener.prototype.updateModel = function() {

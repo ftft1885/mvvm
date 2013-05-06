@@ -17,6 +17,17 @@ demo2需要展示list的增删改
 
 最后能work了，但是解决的很丑陋，希望这次彻底解决这类问题
 
+mvvm只是支持监听添加后的input框
+
+所以在完成view修改model后，model重新渲染view。如果不重新observe的话，修改新出来的input是没有反应的
+
+是否可以在每次updateView后重新添加observe呢？
+
+这是肯定的，因为重新渲染view是用innerHTML的，所有dom都没了，重新出来的。所以每个都要重新observe
+
+bindListener必须重新写，不幸的是listener函数使用了外部变量。。居然难以分离
+
+
 demo
 --------
 我发现暂时只要这点需求就行了。。接下来的需求要在做demo中发掘。或者实际操作中寻找
