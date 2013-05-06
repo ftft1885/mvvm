@@ -1,0 +1,95 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>mvvm</title>
+<script src="fitemp.js"></script>
+<script src="vm.js"></script>
+</head>
+
+<body>
+
+<div id="template">
+
+<script type="template" id="tmp1">
+<div>
+    <label for="firstname">firstname</label>
+    <input id="firstname" name="person1.firstname" type="text" value="<%=firstname%>"></input>
+</div>
+<div>
+    <label for="lastname">lastname</label>
+    <input id="lastname" name="person1.lastname" type="text" value="<%=lastname%>"/>
+</div>
+<div>
+    <label>my name is : </label><span><%=(firstname+' '+lastname)%></span>
+</div>
+<select name="person1.age">
+	<option value="11">11</option>
+	<option value="22">22</option>
+</select>
+<div>
+	<h4>radio</h4>
+	<label>
+		<input type="radio" name="person1.gender" value="male" <%if (gender == "male")%> checked <%;%>/>
+		Male
+	</label>
+	<label>
+		<input type="radio" name="person1.gender" value="female" <%if (gender == "female")%> checked <%;%>/>
+		Female
+	</label>
+</div>
+<%for (var i = 0; i < hosts.length; i++) { var host = hosts[i];%>
+	<div>
+		<input type="text" name="hosts.<%=i%>.ip" value="<%=host.ip%>" />
+		<input type="text" name="hosts.<%=i%>.domain" value="<%=host.domain%>" />
+	</div>
+	
+<%}%>
+</script>
+
+</div>
+
+<div id="show">
+
+<div id="view-tmp1" data-name="view-tmp1">
+</div>
+
+</div>
+
+
+</body>
+<script>
+function $(id) {
+    return document.getElementById(id);
+}
+window.onload = function() {
+
+var person1 = {
+	firstname: 'first',
+	lastname: 'last',
+	age: '11',
+	gender: 'male',
+	hosts: [
+		{
+			ip: '192.168.2.2',
+			domain: 'www.baidu.com'
+		},
+		{
+			ip: '192.168.9.9',
+			domain: 'www.google.com'
+		}
+	]
+}
+
+$('view-tmp1').innerHTML = temp.render('tmp1', person1);
+
+//strongObserve();
+weakObserve();
+/*
+document.addEventListener('click', function(e) {
+    console.log(e.target.tagName);
+})
+*/
+}
+</script>
+</html>

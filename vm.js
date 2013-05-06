@@ -42,13 +42,13 @@ function weakObserve(parent) {
         els[i].addEventListener('change', _listener);
     }
     function _listener(e) {
-        if (typeof e.target.dataset[bind] === "string") {
-            updateView(e.target.dataset[bind], e.target.value);
+        if (typeof e.target.name === "string") {
+            updateModel(e.target.name, e.target.value);
         }
     }
 }
 
-function updateView(key, val) {
+function updateModel(key, val) {
     console.log(key,val);
 }
 
