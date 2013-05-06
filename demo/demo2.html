@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>demo2: list</title>
+	<script src="../js/fitemp.js"></script>
+	<script src="../js/vm.js"></script>
+</head>
+<body>
+<script type="viewmodel" id="myvm">
+<%for (var i = 0; i < hosts.length; i++) {%>
+	<div>
+		<input type="text" name="hosts.<%=i%>.ip" value="<%=hosts[i].ip%>" />
+		<input type="text" name="hosts.<%=i%>.domain" value="<%=hosts[i].domain%>" />
+	</div>
+<%}%>
+</script>
+<div id="myview">
+</div>
+<pre id="model">
+</pre>
+<script>
+var model = {};
+model.hosts = [
+	{
+		ip: '192.168.1.4',
+		domain: 'www.baidu.com'
+	},
+	{
+		ip: '192.168.2.5',
+		domain: 'www.google.com'
+	}
+];
+
+weakObserve({
+	model: model,
+	view: 'myview',
+	vm: 'myvm',
+	onchange: function(e) {
+		document.getElementById('model').innerHTML = JSON.stringify(e.model, null, '\t');
+	}
+});
+</script>
+</body>
+</html>
