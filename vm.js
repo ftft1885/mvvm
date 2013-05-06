@@ -60,10 +60,26 @@ function updateModel(key, val) {
 	console.log(model.person1);
 	$('showmodel').innerHTML = JSON.stringify(model.person1, null, '\t');
 }
+function testpush() {
+arr2json({
+	method: 'push',
+	arr: ['person1', 'hosts'],
+	json: model,
+	val: {ip: '9827237', domain: 'www.163.com'}
+})
+$('showmodel').innerHTML = JSON.stringify(model.person1, null, '\t');
+}
+
 
 function arr2json(p) {
 	if (p.arr.length === 1) {
-		p.json[p.arr[0]] = p.val;
+		console.log(p);
+		if (p.method && p.method in p.json[p.arr[0]]) {
+			// I has the method!
+			p.json[p.arr[0]][p.method](p.val);
+		} else {
+			p.json[p.arr[0]] = p.val;
+		}
 	} else {
 		var tmp = p.arr.shift();
 		if (typeof p.json[tmp] === 'object') {

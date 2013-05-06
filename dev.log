@@ -32,6 +32,21 @@ updateModel函数
 
 完成updateModel()，我觉得非常完美
 
+如何用modelUpdate来push数组
+----------
+push数组的常用程度堪比修改input
+
+我们希望的方法是
+arr2json({
+	method: 'push',
+	arr: [person1, hosts],
+	val: {sth},
+	json: model	
+})
+这样的意思很明显，就是向json[arr]中push元素val
+
+完成了这个，非常完美
+
 
 重要方法
 -----------
