@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>demo1 nested</title>
+	<script src="../js/fitemp.js"></script>
+	<script src="../js/vm.js"></script>
+</head>
+<body>
+<script type="template" id="myvm">
+<%for(var key in people) { var person = people[key];%>
+	<div>
+		<h4><%=key%></h4>
+		<label>firstname: 
+			<input type="text" value="<%=person.firstname%>" name="<%=key%>.firstname"/>
+		</label>
+		<label>lastname:
+			<input type="text" value="<%=person.lastname%>" name="<%=key%>.lastname">
+		</label>
+		<label>age:
+			<input type="text" value="<%=person.age%>" name="<%=key%>.age">
+		</label>
+	</div>
+<%}%>
+</script>
+<div id="myview">
+</div>
+<pre id="model">
+</pre>
+<script>
+var people = {
+	person1: {
+		firstname: 'Tony',
+		lastname: 'Stark',
+		age: '30'
+	},
+	person2: {
+		firstname: 'John',
+		lastname: 'Stewart',
+		age: '31'
+	}
+}
+
+
+function $(id) {
+	return document.getElementById(id);
+}
+
+
+$('model').innerHTML = JSON.stringify(people, null, '\t');
+weakObserve({
+	vm: 'myvm',
+	model: people,
+	view: 'myview',
+	onchange: function(e) {
+		$('model').innerHTML = JSON.stringify(e.model, null, '\t');
+	}
+});
+
+</script>
+</body>
+</html>

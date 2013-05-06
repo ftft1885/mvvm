@@ -24,7 +24,10 @@ function strongObserve(parent) {
     }
 }
 
-function weakObserve(parent) {
+function weakObserve(o) {
+	var e = new vmListener(o);
+	
+	e.updateView(o);
     var bind = "bind";
     var inputs = document.getElementsByTagName('input');
     var selects = document.getElementsByTagName('select');
@@ -41,13 +44,45 @@ function weakObserve(parent) {
     for(var i = 0; i < els.length; i++) {
         els[i].addEventListener('change', _listener);
     }
-    function _listener(e) {
-        if (typeof e.target.name === "string") {
-            updateModel(e.target.name, e.target.value);
+    function _listener(_e) {
+        if (typeof _e.target.name === "string") {
+			e.key = _e.target.name;
+			e.val = _e.target.value;
+			var changeListener = 'onchange';
+			e.updateModel();
+			if (changeListener in o && typeof o[changeListener] === 'function') {
+				
+				o[changeListener](e);
+			}
+//            updateModel(e.target.name, e.target.value);
         }
     }
 }
 
+function vmListener(o) {
+	this.vm = o.vm;
+	this.model = o.model;
+	this.view = o.view;
+}
+
+vmListener.prototype.updateView = function() {
+	var htmlStr = temp.render(this.vm, this.model);
+	document.getElementById(this.view).innerHTML = htmlStr;
+}
+
+vmListener.prototype.updateModel = function() {
+	var _arr = this.key.split('.');
+	arr2json({
+		arr: _arr,
+		val: this.val,
+		json: this.model
+	});
+}
+/*
+function updateView(o) {
+	var htmlStr = temp.render(o.vm, o.model);
+	document.getElementById(o.view).innerHTML = htmlStr;
+}
 function updateModel(key, val) {
     console.log(key,val);
 	var _arr = key.split('.');
@@ -57,9 +92,12 @@ function updateModel(key, val) {
 		val: val,
 		json: model
 	});
-	console.log(model.person1);
-	$('showmodel').innerHTML = JSON.stringify(model.person1, null, '\t');
+	//console.log(model.person1);
+	//$('showmodel').innerHTML = JSON.stringify(model.person1, null, '\t');
 }
+
+*/
+
 function testpush() {
 arr2json({
 	method: 'push',

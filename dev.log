@@ -1,6 +1,58 @@
 5-6
 =========
 
+
+
+demo
+--------
+我发现暂时只要这点需求就行了。。接下来的需求要在做demo中发掘。或者实际操作中寻找
+
+做demo的时候发现模板的id，model，还有显示div的id应该是绑在一起的。他们可以被互相获取
+
+但是应该谁是key呢？
+
+1. model不能是key，因为他是一个hash了
+
+2. 模板id不能是key，因为用模板id来获取model想想觉不对。
+
+3. 显示div的id也不能是key。同理，
+
+所以key只能vm，它包含3个子key： 
+
++ model
++ view（显示div的id）
++ viewmodel（模板id）
+
+可能的动作貌似就两种
+
+model + viewmodel => view(生成内容, model改变view)
+
+view ==> model(view改变model)
+
+所以就用一个对象表示，如：
+
+		weakObserve({
+			model: myModel,
+			view: 'myView',
+			vm: 'myvm'
+		});
+
+但问题又来了，当model修改的使用，我们应该知道数据被修改了。需要加上回调
+
+回调的参数是什么呢？首先肯定是e(event)，其次还要有model，vm，view这些信息，还要能调用update这些函数！
+
+所以e是一个大对象那些update函数都能放在e的prototype中
+
+demo1：嵌套表单显示
+
+demo2：列表的增删改(Hosts)
+
+demo2问题：没有摆脱dom操作，增加view就是dom操作,除非是重新渲染
+
+demo3: 实时更新
+
+demo4: todo-list
+
 data-bind出现问题
 --------
 使用data-bind的话，由于浏览器是用name作为radio唯一判断的，使用data-bind将还必须写上name。这完全是多此一举。
