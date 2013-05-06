@@ -40,8 +40,8 @@
 </div>
 <%for (var i = 0; i < hosts.length; i++) { var host = hosts[i];%>
 	<div>
-		<input type="text" name="hosts.<%=i%>.ip" value="<%=host.ip%>" />
-		<input type="text" name="hosts.<%=i%>.domain" value="<%=host.domain%>" />
+		<input type="text" name="person1.hosts.<%=i%>.ip" value="<%=host.ip%>" />
+		<input type="text" name="person1.hosts.<%=i%>.domain" value="<%=host.domain%>" />
 	</div>
 	
 <%}%>
@@ -54,6 +54,9 @@
 <div id="view-tmp1" data-name="view-tmp1">
 </div>
 
+<pre id="showmodel">
+</pre>
+
 </div>
 
 
@@ -64,7 +67,9 @@ function $(id) {
 }
 window.onload = function() {
 
-var person1 = {
+window.model = {};
+
+window.model.person1 = {
 	firstname: 'first',
 	lastname: 'last',
 	age: '11',
@@ -81,7 +86,7 @@ var person1 = {
 	]
 }
 
-$('view-tmp1').innerHTML = temp.render('tmp1', person1);
+$('view-tmp1').innerHTML = temp.render('tmp1', model.person1);
 
 //strongObserve();
 weakObserve();

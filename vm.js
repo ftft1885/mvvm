@@ -50,8 +50,55 @@ function weakObserve(parent) {
 
 function updateModel(key, val) {
     console.log(key,val);
+	var _arr = key.split('.');
+//	arr2json(_arr, model, val);
+	arr2json({
+		arr: _arr,
+		val: val,
+		json: model
+	});
+	console.log(model.person1);
+	$('showmodel').innerHTML = JSON.stringify(model.person1, null, '\t');
 }
 
+function arr2json(p) {
+	if (p.arr.length === 1) {
+		p.json[p.arr[0]] = p.val;
+	} else {
+		var tmp = p.arr.shift();
+		if (typeof p.json[tmp] === 'object') {
+			p.json = p.json[tmp];
+			arr2json(p);
+		} else {
+			var last = "", str;
+			for (var i = 0; i < p.arr.length; i++) {
+				last += '}';
+			}
+			str = '{"' + p.arr.join('":{"') + '":' + '"1"' + last;
+			p.json[tmp] = JSON.parse(str);
+		}
+	}
+}
+
+/*
+function arr2json(arr, json, val) {
+	if (arr.length === 1) {
+		json[arr[0]] = val;
+	} else {
+		var tmp = arr.shift();
+		if (typeof json[tmp] === 'object') {
+			arr2json(arr, json[tmp], val);
+		} else {
+			var last = "", str;
+			for (var i = 0; i < arr.length; i++) {
+				last += '}';
+			}
+			str = '{"' + arr.join('":{"') + '":' + '"1"' + last;
+			json[tmp] = JSON.parse(str);
+		}
+	}
+}
+*/
 function genView(name) {
     var divs = getElementsByTagName('div');
     var div = null;

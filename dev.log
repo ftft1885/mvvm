@@ -30,6 +30,8 @@ updateModel函数
 
 鉴于我发现毕竟我的html模板是string而不是dom，无法查找原来的。所以貌似只能重写了
 
+完成updateModel()，我觉得非常完美
+
 
 重要方法
 -----------
