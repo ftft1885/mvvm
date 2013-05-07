@@ -12,6 +12,20 @@
 
 成功实现，发现不能用keypress，而是该用keyup，value修改时keypress还是之前的，keyup则已经改了
 
+用户如何传参数进去？------
+
+是把事件信息作为回调函数的参数，还是作为self的一个event属性?
+
+显然是最为event属性用起来更加爽，这有什么安全性问题吗？比如我们需要bind数据给某个button触发的事件
+
+onclick = function() {
+	this.bind(data);
+}
+那bind函数直接找上一次的事件就好了，他从上次事件记录的method就可以处理了。每次监听触发都会更新lastEvent.
+
+所以暂时看来是可行的
+
+
 
 5-6
 =========

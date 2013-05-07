@@ -41,23 +41,26 @@ function $(id) {
 	return document.getElementById(id);
 }
 
-weakObserve({
-	model: model,
-	view: 'myview',
+var mvvm = new MVVM({
 	vm: 'myvm',
-	onchange: function(e) {
-		document.getElementById('model').innerHTML = JSON.stringify(e.model, null, '\t');
-	},
-	onclick: function(e) {
-		var val = {
+	model: model,
+	view: 'myview'
+});
+mvvm.onclick = function(e) {
+	if (e.name === 'hosts' && e.type == 'click') {
+		console.log(this);
+		
+		this.bind({
 			ip: $('newip').value,
 			domain: $('newdomain').value
-		};	
-		e.push(val);
-		e.updateView();
-		document.getElementById('model').innerHTML = JSON.stringify(e.model, null, '\t');
+		});		
+		$('model').innerHTML = JSON.stringify(this.model, null, '\t');
 	}
-});
+}
+
+mvvm.onchange = function() {
+	$('model').innerHTML = JSON.stringify(this.model, null, '\t');
+}
 </script>
 </body>
 </html>

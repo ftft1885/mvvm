@@ -21,6 +21,22 @@ function MVVM(o) {
 	this.observe();
 }
 
+MVVM.prototype.bind = function(val) {
+	var self = this;
+	var e = this.lastEvent;
+	console.log(this.model);
+	var opts = {
+		json: self.model,
+		arr: e.name.split('.'),
+		val: val,
+		method: e.method
+	}
+	arr2json(opts);	
+	
+	// default to updateView
+	self.updateView();
+}
+
 MVVM.prototype.observe = function() {
 	document.addEventListener('click', _listener);
     document.addEventListener('keyup', _listener);
@@ -30,9 +46,22 @@ MVVM.prototype.observe = function() {
 		if (target.name && target.name != '') {
 
 			// get a name, it should be observe
-			if (target.value) {
+			var method = target.getAttribute('method');
+			if (method !== null && target.name !== '') {
 
-				// has a value, value may be changed
+				// this is a button like, can push/pop/del..
+				// but need to get a val to input
+				var lastEvent = {
+					type: e.type,
+					name: target.name,
+					method: method
+				}
+				self.lastEvent = lastEvent;
+				self.onclick && self.onclick(lastEvent);
+				
+			} else if (target.value) {
+
+				// has a value, value may be changed, and it is sth can change model.
 				var preVal = "";
 				arr2json({
 					arr: target.name.split('.'),
@@ -309,6 +338,7 @@ $('showmodel').innerHTML = JSON.stringify(model.person1, null, '\t');
 
 
 function arr2json(p) {
+
 	if (p.arr.length === 1) {
 		//console.log(p);
 		if ('getVal' in p && typeof p.getVal === 'function') {
