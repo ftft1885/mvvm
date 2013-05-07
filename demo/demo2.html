@@ -18,7 +18,9 @@
 <hr>
 <input type="text" id="newip" />
 <input type="text" id="newdomain"/>
-<button name="hosts" method="push">添加</button>
+<br>
+<button name="hosts" method="push">添加到最末</button>
+<button name="hosts" method="unshift">添加到开头</button>
 </script>
 <div id="myview">
 </div>
@@ -46,6 +48,9 @@ var mvvm = new MVVM({
 	model: model,
 	view: 'myview'
 });
+	
+$('model').innerHTML = JSON.stringify(model, null, '\t');
+
 mvvm.onclick = function(e) {
 	if (e.name === 'hosts' && e.type == 'click') {		
 		this.bind({

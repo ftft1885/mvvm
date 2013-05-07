@@ -31,6 +31,17 @@
 </div>
 
 <div>
+	<h3>Color</h3>
+	<%var colors = ['Blue', 'Gray','Green', 'Orange', 'Red'];%>
+	<%colors.forEach(function(_color){%>
+		<label>
+			<input type="checkbox" value="<%=_color%>" name="color" <%if(color.indexOf(_color) != -1)%> checked <%;%>/>
+			<%=_color%>
+		</label>
+	<%})%>
+</div>
+
+<div>
 	<h3>Food</h3>
 	<select name="food">
 	<%var foods = ['Streak', 'Pizza', 'Chicken'];%>
@@ -57,7 +68,8 @@ var person = {
 	firstname: 'Tony',
 	lastname: 'Stark',
 	gender: 'female',
-	info: 'this is textarea'
+	info: 'this is textarea',
+	color: ['Red', 'Green']
 }
 
 function $(id) {

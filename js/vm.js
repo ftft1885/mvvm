@@ -32,6 +32,7 @@ MVVM.prototype.bind = function(val) {
 	}
 	if (opts.method === 'delete') {
 		opts.method = 'splice',
+		// we need to know the name index
 		opts.val = opts.arr.pop();
 	}
 	console.log(opts);
@@ -64,6 +65,8 @@ MVVM.prototype.observe = function() {
 				self.onclick && self.onclick(lastEvent);
 				
 			} else if (target.value) {
+				
+				//console.log(e);
 
 				// has a value, value may be changed, and it is sth can change model.
 				var preVal = "";
@@ -74,36 +77,68 @@ MVVM.prototype.observe = function() {
 						preVal = val;
 					}
 				});
-				if (target.value != preVal) {
-					
-					// value is changed
-					var changeKV = {
+
+				if (target.value !== preVal) {
+
+					var opt = {
 						name: target.name,
 						val: target.value,
+						method: null,
 						preVal: preVal
 					}
 
-					// updateModel is default
-					self.updateModel(changeKV);
+					// check the preVal to see if it is an array
+					if (isArray(preVal) && 'checked' in target) {
+						
+						// it's name bindto data is a array and the tag is a checkbox
+						if (target.checked === true) {
+							opt.method = 'push';
+						} else {
+							opt.method = 'delete';
+						}
 
-					self.onchange && self.onchange({
-						name: target.name,
-						val: target.value,
-						preVal: preVal
-					});
+					} else {
+					
+						// value is changed
+						
+						var changeKV = {
+							name: target.name,
+							val: target.value,
+							preVal: preVal
+						}
+
+					}					
+					// updateModel is default
+					self.updateModel(opt)
+					self.onchange && self.onchange(opt);
+
 				}
+
 			}
 		}
 	}
 
 }
 
+var isArray = Array.isArray || function(o) {
+	return typeof o === 'object' && Object.prototype.toString.call(o) === '[object Array]';
+}
+
 MVVM.prototype.updateModel = function(kv) {
 	var _arr = kv.name.split('.');
+	var method = kv.method;
+	var val = kv.val;
+	if (method == 'delete') {
+
+		// method is delete and val is not important but we need to know the index
+		method = 'splice';
+		val = kv.preVal.indexOf(val);		
+	}
 	arr2json({
 		arr: _arr,
-		val: kv.val,
-		json: this.model
+		val: val,
+		json: this.model,
+		method: method
 	});
 }
 
