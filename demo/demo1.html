@@ -7,10 +7,17 @@
 	<script src="../js/vm.js"></script>
 </head>
 <body>
+<style>
+.nest {
+	margin-left: 20px;
+	padding-left: 5px;
+	border-left: 2px solid #ccc;
+}
+</style>
 <script type="template" id="myvm">
 <%for(var key in people) { var person = people[key];%>
 	<div>
-		<h4><%=key%></h4>
+		<h3><%=key%></h3>
 		<label>firstname: 
 			<input type="text" value="<%=person.firstname%>" name="<%=key%>.firstname"/>
 		</label>
@@ -20,7 +27,17 @@
 		<label>age:
 			<input type="text" value="<%=person.age%>" name="<%=key%>.age">
 		</label>
+		<div class="nest">
+			<h5>mother</h5>
+			<label>name:
+				<input type="text" value="<%=person.mother.name%>" name="<%=key%>.mother.name">
+			</label><br>
+			<label>age: 
+				<input type="text" value="<%=person.mother.age%>" name="<%=key%>.mother.age"
+			</label>
+		</div>
 	</div>
+	<hr />
 <%}%>
 </script>
 <div id="myview">
@@ -32,30 +49,38 @@ var people = {
 	person1: {
 		firstname: 'Tony',
 		lastname: 'Stark',
-		age: '30'
+		age: '30',
+		mother: {
+			name: 'Tony Mother',
+			age: '50'
+		}
 	},
 	person2: {
 		firstname: 'John',
 		lastname: 'Stewart',
-		age: '31'
+		age: '31',
+		mother: {
+			name: 'John Mother',
+			age: '52'
+		}
 	}
 }
 
+var mvvm = new MVVM({
+	vm: 'myvm',
+	model: people,
+	view: 'myview',
+});
+
+$('model').innerHTML = JSON.stringify(people, null, '\t');
+
+mvvm.onchange = function(e) {
+	$('model').innerHTML = JSON.stringify(this.model, null, '\t');
+}
 
 function $(id) {
 	return document.getElementById(id);
 }
-
-
-$('model').innerHTML = JSON.stringify(people, null, '\t');
-weakObserve({
-	vm: 'myvm',
-	model: people,
-	view: 'myview',
-	onchange: function(e) {
-		$('model').innerHTML = JSON.stringify(e.model, null, '\t');
-	}
-});
 
 </script>
 </body>
