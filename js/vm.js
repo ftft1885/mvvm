@@ -13,14 +13,102 @@
 
 var tags = ['INPUT', 'SELECT'];
 
-function strongObserve(parent) {
-    document.addEventListener('click', _listener);
+function MVVM(o) {
+	this.view = o.view; // we know view id then we know how much we control the observe(parent)
+	this.model = o.model;
+	this.vm = o.vm;
+	this.updateView(); // it is default
+	this.observe();
+}
+
+MVVM.prototype.observe = function() {
+	document.addEventListener('click', _listener);
     document.addEventListener('keyup', _listener);
+	var self = this;
     function _listener(e) {
-        if (tags.indexOf(e.target.tagName) != -1) {
-            console.log(e.target.dataset.bind);
-            
-        }
+		var target = e.target || e.srcElement;
+		if (target.name && target.name != '') {
+
+			// get a name, it should be observe
+			if (target.value) {
+
+				// has a value, value may be changed
+				var preVal = "";
+				arr2json({
+					arr: target.name.split('.'),
+					json: self.model,
+					getVal: function(val) {
+						preVal = val;
+					}
+				});
+				if (target.value != preVal) {
+					
+					// value is changed
+					var changeKV = {
+						name: target.name,
+						val: target.value,
+						preVal: preVal
+					}
+
+					// updateModel is default
+					self.updateModel(changeKV);
+
+					self.onchange && self.onchange({
+						name: target.name,
+						val: target.value,
+						preVal: preVal
+					});
+				}
+			}
+		}
+	}
+
+}
+
+MVVM.prototype.updateModel = function(kv) {
+	var _arr = kv.name.split('.');
+	arr2json({
+		arr: _arr,
+		val: kv.val,
+		json: this.model
+	});
+}
+
+MVVM.prototype.updateView = function() {
+	document.getElementById(this.view).innerHTML = temp.render(this.vm, this.model);
+}
+
+function strongObserve(o) {
+    document.addEventListener('click', _listener);
+    document.addEventListener('keypress', _listener);
+    function _listener(e) {
+		var target = e.target || e.srcElement;
+		if (target.name !== '') {
+
+			// get a name, and it should be observe
+			if (target.value) {
+
+				// has a value,then it may be changed
+				var preVal = "";
+				arr2json({
+					arr: target.name.split('.'),
+					json: o.model,
+					getVal: function(val) {
+						preVal = val;
+					}
+				});
+				if (target.value != preVal) {
+					
+					// value is changed
+					o.onchange && o.onchange({
+						name: target.name,
+						val: target.value,
+						preVal: preVal
+					});
+					// updateModel is default
+				}
+			}
+		}
     }
 }
 
@@ -222,8 +310,10 @@ $('showmodel').innerHTML = JSON.stringify(model.person1, null, '\t');
 
 function arr2json(p) {
 	if (p.arr.length === 1) {
-		console.log(p);
-		if (p.method && p.method in p.json[p.arr[0]]) {
+		//console.log(p);
+		if ('getVal' in p && typeof p.getVal === 'function') {
+			p.getVal(p.json[p.arr[0]]);
+		} else if (p.method && p.method in p.json[p.arr[0]]) {
 			// I has the method!
 			p.json[p.arr[0]][p.method](p.val);
 		} else {

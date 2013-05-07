@@ -1,3 +1,18 @@
+5-7
+========
+昨天思考了一下，重新绑定事件太丑了，还是回到强监听上。
+
+强监听在chrome中是监听keypress和click两个事件，一般改变view几乎都离不开这两个吧
+
+知道数据被改了，如何触发回调函数？
+
+函数里调用updateModel很容易，但是外部怎么调用呢？
+
+最好就是new (vm,model,view)然后用this调用
+
+成功实现，发现不能用keypress，而是该用keyup，value修改时keypress还是之前的，keyup则已经改了
+
+
 5-6
 =========
 
@@ -26,6 +41,7 @@ mvvm只是支持监听添加后的input框
 这是肯定的，因为重新渲染view是用innerHTML的，所有dom都没了，重新出来的。所以每个都要重新observe
 
 bindListener必须重新写，不幸的是listener函数使用了外部变量。。居然难以分离
+
 
 
 demo
