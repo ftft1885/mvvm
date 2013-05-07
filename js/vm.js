@@ -24,13 +24,17 @@ function MVVM(o) {
 MVVM.prototype.bind = function(val) {
 	var self = this;
 	var e = this.lastEvent;
-	console.log(this.model);
 	var opts = {
 		json: self.model,
 		arr: e.name.split('.'),
 		val: val,
 		method: e.method
 	}
+	if (opts.method === 'delete') {
+		opts.method = 'splice',
+		opts.val = opts.arr.pop();
+	}
+	console.log(opts);
 	arr2json(opts);	
 	
 	// default to updateView
@@ -345,7 +349,14 @@ function arr2json(p) {
 			p.getVal(p.json[p.arr[0]]);
 		} else if (p.method && p.method in p.json[p.arr[0]]) {
 			// I has the method!
-			p.json[p.arr[0]][p.method](p.val);
+			if (p.method === 'splice') {
+
+				// need special handle
+				p.json[p.arr[0]][p.method](p.val, 1);
+			} else {
+				p.json[p.arr[0]][p.method](p.val);
+			}
+
 		} else {
 			p.json[p.arr[0]] = p.val;
 		}

@@ -12,7 +12,7 @@
 	<div>
 		<input type="text" name="hosts.<%=i%>.ip" value="<%=hosts[i].ip%>" />
 		<input type="text" name="hosts.<%=i%>.domain" value="<%=hosts[i].domain%>" />
-		<button name="">删除</button>
+		<button name="hosts.<%=i%>" method="delete">删除</button>
 	</div>
 <%}%>
 <hr>
@@ -47,14 +47,14 @@ var mvvm = new MVVM({
 	view: 'myview'
 });
 mvvm.onclick = function(e) {
-	if (e.name === 'hosts' && e.type == 'click') {
-		console.log(this);
-		
+	if (e.name === 'hosts' && e.type == 'click') {		
 		this.bind({
 			ip: $('newip').value,
 			domain: $('newdomain').value
 		});		
 		$('model').innerHTML = JSON.stringify(this.model, null, '\t');
+	} else if (e.method === 'delete') {
+		this.bind();
 	}
 }
 
