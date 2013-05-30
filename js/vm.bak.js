@@ -44,37 +44,13 @@ MVVM.prototype.bind = function(val) {
 
 MVVM.prototype.observe = function() {
 	document.addEventListener('click', _listener);
-  document.addEventListener('keyup', _listener);
+    document.addEventListener('keyup', _listener);
 	var self = this;
-
-	self.lastTarget = {};
-
     function _listener(e) {
 		var target = e.target || e.srcElement;
 		if (target.name && target.name != '') {
 
 			// get a name, it should be observe
-
-      if ( self.lastTarget.name != target.name) {
-
-        // emit onfocus & onblur event (lastTarget != this targer)
-
-        var opt = {
-        	target: target,
-        	lastTarget: self.lastTarget,
-        	name: target.name
-        }
-        self.onfocus && self.onfocus(opt);
-        if (typeof self.lastTarget.name === 'string') {
-
-          // ensure has a lastTarget
-          self.onblur && self.onblur({
-          	name: self.lastTarget.name,
-          	target: self.lastTarget
-          });
-        }
-        self.lastTarget = target;
-      }
 			var method = target.getAttribute('method');
 			if (method !== null && target.name !== '') {
 
