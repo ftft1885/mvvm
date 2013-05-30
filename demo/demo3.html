@@ -1,0 +1,95 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>demo3 all types</title>
+	<script src="../js/fitemp.js"></script>
+	<script src="../js/vm.js"></script>
+</head>
+<body>
+<script type="template" id="myvm">
+<div>
+	<label>firstname:
+		<input type="text" name="firstname" value="<%=firstname%>"/>
+	</label>
+	<label>lastname:
+		<input type="text" name="lastname" value="<%=lastname%>"/>
+	</label>
+</div>
+<div>
+	<h3>Gender</h3>
+	<div>
+		<label>
+			<input type="radio" name="gender" value="male" <%if(gender=='male')%>checked<%;%>/>
+			Male
+		</label>
+		<label>
+			<input type="radio" name="gender" value="female" <%if(gender=='female')%>checked<%;%>/>
+			Female
+		</label>
+	</div>
+</div>
+
+<div>
+	<h3>Color</h3>
+	<%var colors = ['Blue', 'Gray','Green', 'Orange', 'Red'];%>
+	<%colors.forEach(function(_color){%>
+		<label>
+			<input type="checkbox" value="<%=_color%>" name="color" <%if(color.indexOf(_color) != -1)%> checked <%;%>/>
+			<%=_color%>
+		</label>
+	<%})%>
+</div>
+
+<div>
+	<h3>Food</h3>
+	<select name="food">
+	<%var foods = ['Streak', 'Pizza', 'Chicken'];%>
+	<%foods.forEach(function(_food){%>
+		<option value="<%=_food%>">
+			<%=_food%>
+		</option>
+	<%})%>
+	</select>
+</div>
+
+<div>
+	<textarea value="" name="info"><%=info%></textarea>
+</div>
+
+</script>
+<div id="myview">
+</div>
+<h3>Hello <span id="name"></span>!</h3>
+<pre id="model">
+</pre>
+<script>
+var person = {
+	firstname: 'Tony',
+	lastname: 'Stark',
+	gender: 'female',
+	info: 'this is textarea',
+	color: ['Red', 'Green']
+}
+
+function $(id) {
+	return document.getElementById(id);
+}
+
+$('name').innerHTML = person.firstname + ' ' + person.lastname;
+$('model').innerHTML = JSON.stringify(person, null, '\t');
+
+var mvvm = new MVVM({
+	model: person,
+	vm: 'myvm',
+	view: 'myview',
+});
+
+mvvm.onchange = function(e) {	
+	$('name').innerHTML = this.model.firstname + ' ' + this.model.lastname;
+	$('model').innerHTML = JSON.stringify(this.model, null, '\t');
+}
+
+</script>
+</body>
+</html>

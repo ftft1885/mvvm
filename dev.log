@@ -1,0 +1,199 @@
+5-7
+========
+昨天思考了一下，重新绑定事件太丑了，还是回到强监听上。
+
+强监听在chrome中是监听keypress和click两个事件，一般改变view几乎都离不开这两个吧
+
+知道数据被改了，如何触发回调函数？
+
+函数里调用updateModel很容易，但是外部怎么调用呢？
+
+最好就是new (vm,model,view)然后用this调用
+
+成功实现，发现不能用keypress，而是该用keyup，value修改时keypress还是之前的，keyup则已经改了
+
+用户如何传参数进去？------
+
+是把事件信息作为回调函数的参数，还是作为self的一个event属性?
+
+显然是最为event属性用起来更加爽，这有什么安全性问题吗？比如我们需要bind数据给某个button触发的事件
+
+onclick = function() {
+	this.bind(data);
+}
+那bind函数直接找上一次的事件就好了，他从上次事件记录的method就可以处理了。每次监听触发都会更新lastEvent.
+
+所以暂时看来是可行的
+
+
+
+5-6
+=========
+
+demo2: list
+----------
+demo1展示的是解决嵌套问题，在以前的form提交中，嵌套让人痛苦不堪
+
+demo2需要展示list的增删改
+
+这个问题我只能说看似简单，实则复杂。。
+
+就拿上次碰到的一个需求来说。
+
+需求是这样的：在网页上提供修改hosts文件的功能，要求是每项有ip，domain两个框，且提供增删改功能
+
+不幸的是我们那傻x服务器不能ajax，用form做这个简直崩溃，一做起来碰到各种问题，比如hosts的输入框怎么取name，怎么添加，怎么删除。
+
+最后能work了，但是解决的很丑陋，希望这次彻底解决这类问题
+
+mvvm只是支持监听添加后的input框
+
+所以在完成view修改model后，model重新渲染view。如果不重新observe的话，修改新出来的input是没有反应的
+
+是否可以在每次updateView后重新添加observe呢？
+
+这是肯定的，因为重新渲染view是用innerHTML的，所有dom都没了，重新出来的。所以每个都要重新observe
+
+bindListener必须重新写，不幸的是listener函数使用了外部变量。。居然难以分离
+
+
+
+demo
+--------
+我发现暂时只要这点需求就行了。。接下来的需求要在做demo中发掘。或者实际操作中寻找
+
+做demo的时候发现模板的id，model，还有显示div的id应该是绑在一起的。他们可以被互相获取
+
+但是应该谁是key呢？
+
+1. model不能是key，因为他是一个hash了
+
+2. 模板id不能是key，因为用模板id来获取model想想觉不对。
+
+3. 显示div的id也不能是key。同理，
+
+所以key只能vm，它包含3个子key： 
+
++ model
++ view（显示div的id）
++ viewmodel（模板id）
+
+可能的动作貌似就两种
+
+model + viewmodel => view(生成内容, model改变view)
+
+view ==> model(view改变model)
+
+所以就用一个对象表示，如：
+
+		weakObserve({
+			model: myModel,
+			view: 'myView',
+			vm: 'myvm'
+		});
+
+但问题又来了，当model修改的使用，我们应该知道数据被修改了。需要加上回调
+
+回调的参数是什么呢？首先肯定是e(event)，其次还要有model，vm，view这些信息，还要能调用update这些函数！
+
+所以e是一个大对象那些update函数都能放在e的prototype中
+
+demo1：嵌套表单显示
+
+demo2：列表的增删改(Hosts)
+
+demo2问题：没有摆脱dom操作，增加view就是dom操作,除非是重新渲染
+
+demo3: 实时更新
+
+demo4: todo-list
+
+data-bind出现问题
+--------
+使用data-bind的话，由于浏览器是用name作为radio唯一判断的，使用data-bind将还必须写上name。这完全是多此一举。
+
+所以我觉得不如直接用name。。比起data-bind还能少写几个单词。
+
+本来不用name是担心占用使用form的同学的属性。现在想想既然用了model，基本都是ajax的吧。占了就占了
+
+updateModel函数
+--------------
+这个函数要做的就是把
+1. 把person1.firstname 改掉
+2. 如果是数组怎么办?
+
+ >+ 首先这个数组每个都应该是可以改动的。所以name必须精确到i
+ >+ 有数组的pop，push，shift，unshift功能
+
+先考虑用的最多的push。就是添加一项，这已经很复杂了。
+
+如果以前的话，我必须专门记录目前数组的长度，然后使用length+1来做name做出这个元素。
+
+不过在mvvm中应该有的体验是直接对这个数组发送push。
+
+但是如何产生和上面一样的view呢？
+
+如果笨点的话我们只能重写一遍，但只要是重写，我们就知道已经错了，可以重构到没有重复代码
+
+鉴于我发现毕竟我的html模板是string而不是dom，无法查找原来的。所以貌似只能重写了
+
+完成updateModel()，我觉得非常完美
+
+如何用modelUpdate来push数组
+----------
+push数组的常用程度堪比修改input
+
+我们希望的方法是
+arr2json({
+	method: 'push',
+	arr: [person1, hosts],
+	val: {sth},
+	json: model	
+})
+这样的意思很明显，就是向json[arr]中push元素val
+
+完成了这个，非常完美
+
+
+重要方法
+-----------
+model2view
+----------
+model转view非常简单，就是模板文件用model来渲染，生成view。
+
+view2model
+--------
+这个是难点。方法有两种，一种是暴露在公有属性中（如knockout）
+如
+    <input type="text" data-bind="name.firstname" value="<%=name.firstname%>"></input>
+
+这样的缺点是暴露逻辑，且每次都写出重复代码，并且很难将data-bind的值转为key。
+
+重复代码的问题可以用正则解决。
+
+另一种是将html模板转为dom,就是用appendChild而不是innerHTML来改变view。
+
+但是我没有搞清楚原理
+
+因此暂且用第一种，data-bind的方式（很显然这种会使老的浏览器不兼容）
+
+要注意的是，只有需要读取数据的元素才要data-bind
+
+    <span><%=(firstname+lastname)%></span>
+
+这是不需要data-bind的，因为不会从这里面取数据。
+
+非常不幸的是，即便知道修改的key和目前的value，我们依然不知道是修改了哪个model的value
+
+因此还需要model与view绑定的函数,比如model的名字等于view的id
+
+等等。还有一个问题出现了，修改input中的值，也就修改了model，如果整个view都重新渲染了，那会不会每次输入字符都要闪一次？
+
+看看knockout就知道，他分成两种类型,value和text。一种是可以改变model的，另一种是只被model影响而修改
+
+为了先作出个样子，使用弱观察,即addEventListener('change')，这个类似blur，这样的话渲染整个view也没事了。
+
+
+
+
+

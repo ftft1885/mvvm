@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>demo1 nested</title>
+	<script src="../js/fitemp.js"></script>
+	<script src="../js/vm.js"></script>
+</head>
+<body>
+<script type="template" id="myvm">
+<label>firstname:
+	<input type="text" name="firstname" value="<%=firstname%>"/>
+</label>
+<label>lastname:
+	<input type="text" name="lastname" value="<%=lastname%>"/>
+</label>
+
+</script>
+<div id="myview">
+</div>
+<h3>Hello <span id="name"></span>!</h3>
+<pre id="model">
+</pre>
+<script>
+/*
+var people = {
+	person1: {
+		firstname: 'Tony',
+		lastname: 'Stark',
+		age: '30'
+	},
+	person2: {
+		firstname: 'John',
+		lastname: 'Stewart',
+		age: '31'
+	}
+}
+*/
+var person = {
+	firstname: 'Tony',
+	lastname: 'Stark'
+}
+
+function $(id) {
+	return document.getElementById(id);
+}
+
+$('name').innerHTML = person.firstname + ' ' + person.lastname;
+
+var mvvm = new MVVM({
+	model: person,
+	vm: 'myvm',
+	view: 'myview',
+});
+
+mvvm.onchange = function(e) {	
+	$('name').innerHTML = this.model.firstname + ' ' + this.model.lastname;
+}
+
+</script>
+</body>
+</html>

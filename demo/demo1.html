@@ -1,0 +1,87 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<title>demo1 nested</title>
+	<script src="../js/fitemp.js"></script>
+	<script src="../js/vm.js"></script>
+</head>
+<body>
+<style>
+.nest {
+	margin-left: 20px;
+	padding-left: 5px;
+	border-left: 2px solid #ccc;
+}
+</style>
+<script type="template" id="myvm">
+<%for(var key in people) { var person = people[key];%>
+	<div>
+		<h3><%=key%></h3>
+		<label>firstname: 
+			<input type="text" value="<%=person.firstname%>" name="<%=key%>.firstname"/>
+		</label>
+		<label>lastname:
+			<input type="text" value="<%=person.lastname%>" name="<%=key%>.lastname">
+		</label>
+		<label>age:
+			<input type="text" value="<%=person.age%>" name="<%=key%>.age">
+		</label>
+		<div class="nest">
+			<h5>mother</h5>
+			<label>name:
+				<input type="text" value="<%=person.mother.name%>" name="<%=key%>.mother.name">
+			</label><br>
+			<label>age: 
+				<input type="text" value="<%=person.mother.age%>" name="<%=key%>.mother.age"
+			</label>
+		</div>
+	</div>
+	<hr />
+<%}%>
+</script>
+<div id="myview">
+</div>
+<pre id="model">
+</pre>
+<script>
+var people = {
+	person1: {
+		firstname: 'Tony',
+		lastname: 'Stark',
+		age: '30',
+		mother: {
+			name: 'Tony Mother',
+			age: '50'
+		}
+	},
+	person2: {
+		firstname: 'John',
+		lastname: 'Stewart',
+		age: '31',
+		mother: {
+			name: 'John Mother',
+			age: '52'
+		}
+	}
+}
+
+var mvvm = new MVVM({
+	vm: 'myvm',
+	model: people,
+	view: 'myview',
+});
+
+$('model').innerHTML = JSON.stringify(people, null, '\t');
+
+mvvm.onchange = function(e) {
+	$('model').innerHTML = JSON.stringify(this.model, null, '\t');
+}
+
+function $(id) {
+	return document.getElementById(id);
+}
+
+</script>
+</body>
+</html>
